@@ -21,8 +21,31 @@ public class ModEntry : Mod
 	private void Display_RenderingActiveMenu(object? sender, RenderingActiveMenuEventArgs e)
 	{
 		var menu = Game1.activeClickableMenu;
-		if (menu is not ItemGrabMenu)
+		if (menu is not ItemGrabMenu) 
 			return;
 
+		var chestMenu = (ItemGrabMenu)menu;
+		if (chestMenu.ItemsToGrabMenu is BiggerChestMenu)
+			return;
+
+		chestMenu.ItemsToGrabMenu = new BiggerChestMenu(
+			chestMenu.xPositionOnScreen,
+			chestMenu.yPositionOnScreen,
+			true,
+			chestMenu.ItemsToGrabMenu.actualInventory,
+			capacity: 48,
+			rows: 4
+		);
+
+		//if (chestMenu.ItemsToGrabMenu.rows <= 3)
+		//{
+		//	chestMenu.ItemsToGrabMenu.capacity = 60;
+		//	chestMenu.ItemsToGrabMenu.rows = 5;
+		//}
+
+
+		// chestMenu.ItemsToGrabMenu.rows
+		//menu = new BiggerChestMenu(chestMenu.sourceItem)
+		//menu.draw(e.SpriteBatch);
 	}
 }

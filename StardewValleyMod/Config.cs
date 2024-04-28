@@ -16,4 +16,9 @@ public class Config
 	/// 总共多少列
 	/// </summary>
 	public int ChestColumns { get; set; }
+
+	public void LoadConfig()
+	{
+
+	}
 }
