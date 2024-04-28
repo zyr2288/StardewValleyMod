@@ -1,0 +1,10 @@
+{
+  "Name": "Bigger Chest",
+  "Author": "ZENG GE",
+  "Version": "0.0.1-beta.1",
+  "Description": "Bigger Chest",
+  "UniqueID": "ZENG-GE.BiggerChest",
+  "EntryDll": "BiggerChest.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}
