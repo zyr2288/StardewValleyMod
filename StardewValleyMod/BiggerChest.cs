@@ -8,39 +8,65 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static StardewValley.Menus.CharacterCustomization;
+using static StardewValley.Menus.InventoryMenu;
 
 namespace BiggerChest;
 
+
+
+#region 大箱子类
+/// <summary>
+/// 大箱子类
+/// </summary>
 public class BiggerChest
 {
 	public const int Rows = 6;
-	public const int Columns = 14;
-
-	[HarmonyPostfix]
-	public static void ShowMenu(Chest __instance)
-	{
-		if (Game1.activeClickableMenu is ItemGrabMenu menu)
-		{
-			menu.ItemsToGrabMenu.capacity = Rows * Columns;
-			menu.ItemsToGrabMenu.rows = Rows;
-		}
-	}
+	public const int Columns = 16;
+	public const int Capacity = Rows * Columns;
 
 	[HarmonyPostfix]
 	public static void GetCapacity(Chest __instance, ref int __result)
 	{
-		__result = Rows * Columns;
+		__result = Capacity;
+	}
+
+	[HarmonyFinalizer]
+	public static void CreateChestMenu(InventoryMenu __instance, int xPosition, int yPosition, bool playerInventory, IList<Item> actualInventory)
+	{
+		Console.WriteLine(__instance);
+
+		// 如果是玩家库存
+		if (__instance.playerInventory)
+			return;
+
+		__instance.rows = Rows;
+		__instance.capacity = Capacity;
 	}
 
 	public static void Install()
 	{
-		var tempChest = new Chest();
+		// int xPosition, int yPosition, bool playerInventory, IList< Item > actualInventory = null, highlightThisItem highlightMethod = null,
+		// int capacity = -1, int rows = 3, int horizontalGap = 0, int verticalGap = 0, bool drawSlots = true
+
+		// 不加不能匹配 InventoryMenu
+		var types = new Type[]
+		{
+			typeof(int), typeof(int), typeof(bool), typeof(IList<Item>), typeof(highlightThisItem),
+			typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool)
+		};
 
 		GlobalVar.SMAPIHarmonyLib.Patch(
-			original: AccessTools.Method(typeof(Chest), nameof(tempChest.ShowMenu)),
-			postfix: new HarmonyMethod(AccessTools.Method(typeof(BiggerChest), nameof(ShowMenu)))
+			original: AccessTools.Constructor(typeof(InventoryMenu), types),
+			finalizer: new HarmonyMethod(AccessTools.Method(typeof(BiggerChest), nameof(CreateChestMenu)))
 		);
 
+
+		//GlobalVar.SMAPIHarmonyLib.Patch(
+		//	original: AccessTools.Method(typeof(Chest), nameof(tempChest.ShowMenu)),
+		//	postfix: new HarmonyMethod(AccessTools.Method(typeof(BiggerChest), nameof(ShowMenu)))
+		//);
+
+		var tempChest = new Chest();
 		GlobalVar.SMAPIHarmonyLib.Patch(
 			original: AccessTools.Method(typeof(Chest), nameof(tempChest.GetActualCapacity)),
 			postfix: new HarmonyMethod(AccessTools.Method(typeof(BiggerChest), nameof(GetCapacity)))
@@ -48,41 +74,29 @@ public class BiggerChest
 	}
 	
 }
+#endregion 大箱子类
 
-public class BiggerChestMenu : InventoryMenu
-{
-	public BiggerChestMenu(InventoryMenu baseMenu) :
-		base(baseMenu.xPositionOnScreen, yPosition, playerInventory, actualInventory, highlightMethod, capacity, rows, horizontalGap, verticalGap, drawSlots)
-	{
-		if (source == 1 && sourceItem is Chest chest3 && chest3.GetActualCapacity() != 36)
-		{
-			int actualCapacity = chest3.GetActualCapacity();
-			int num = ((actualCapacity >= 70) ? 5 : 3);
-			if (actualCapacity < 9)
-			{
-				num = 1;
-			}
+//public class BiggerChestMenu : InventoryMenu
+//{
+//	public const int BlockWidth = 64;
 
-			int num2 = 64 * (actualCapacity / num);
-			ItemsToGrabMenu = new InventoryMenu(Game1.uiViewport.Width / 2 - num2 / 2, yPositionOnScreen + ((actualCapacity < 70) ? 64 : (-21)), playerInventory: false, inventory, highlightFunction, actualCapacity, num);
-			if (chest3.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin)
-			{
-				base.inventory.moveItemSound = "Ship";
-			}
+//	public BiggerChestMenu(ItemGrabMenu menu) :
+//		base(menu.ItemsToGrabMenu.xPositionOnScreen, menu.ItemsToGrabMenu.yPositionOnScreen,
+//		menu.ItemsToGrabMenu.playerInventory, menu.ItemsToGrabMenu.actualInventory, menu.ItemsToGrabMenu.highlightMethod,
+//		menu.ItemsToGrabMenu.capacity, menu.ItemsToGrabMenu.rows, 
+//		menu.ItemsToGrabMenu.horizontalGap, menu.ItemsToGrabMenu.verticalGap, menu.ItemsToGrabMenu.drawSlots)
+//	{
+//		int width = BlockWidth * BiggerChest.Columns;
+//		// xPositionOnScreen = Game1.uiViewport.Width / 2 - width / 2;
+//		// yPositionOnScreen = yPositionOnScreen + ((actualCapacity < 70) ? 64 : (-21);
 
-			if (num > 3)
-			{
-				yPositionOnScreen += 42;
-				base.inventory.SetPosition(base.inventory.xPositionOnScreen, base.inventory.yPositionOnScreen + 38 + 4);
-				ItemsToGrabMenu.SetPosition(ItemsToGrabMenu.xPositionOnScreen - 32 + 8, ItemsToGrabMenu.yPositionOnScreen);
-				storageSpaceTopBorderOffset = 20;
-				trashCan.bounds.X = ItemsToGrabMenu.width + ItemsToGrabMenu.xPositionOnScreen + IClickableMenu.borderWidth * 2;
-				okButton.bounds.X = ItemsToGrabMenu.width + ItemsToGrabMenu.xPositionOnScreen + IClickableMenu.borderWidth * 2;
-			}
-		}
-		else
-		{
-			ItemsToGrabMenu = new InventoryMenu(xPositionOnScreen + 32, yPositionOnScreen, playerInventory: false, inventory, highlightFunction);
-		}
-	}
-}
+//		// menu.SetPosition(menu.inventory.xPositionOnScreen, menu.inventory.yPositionOnScreen);
+//		// SetPosition(xPositionOnScreen, yPositionOnScreen + 38 + 4);
+//		// menu.ItemsToGrabMenu.SetPosition(menu.ItemsToGrabMenu.xPositionOnScreen, menu.ItemsToGrabMenu.yPositionOnScreen);
+//		menu.storageSpaceTopBorderOffset = 20;
+
+//		var xPos = width + menu.xPositionOnScreen;
+//		menu.trashCan.bounds.X = xPos;
+//		menu.okButton.bounds.X = xPos;
+//	}
+//}
