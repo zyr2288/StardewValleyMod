@@ -11,11 +11,11 @@ public class Config
 	/// <summary>
 	/// 总共多少行
 	/// </summary>
-	public int ChestRows { get; set; }
+	public static int Rows { get; set; } = 5;
 	/// <summary>
 	/// 总共多少列
 	/// </summary>
-	public int ChestColumns { get; set; }
+	public static int Columns { get; set; } = 16;
 
 	public void LoadConfig()
 	{
