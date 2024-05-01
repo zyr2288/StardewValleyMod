@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiggerChest", "StardewValleyMod\BiggerChest.csproj", "{DE3CECF4-1C6D-485E-BC74-96CA97FB8D9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiggerChest", "StardewValleyMod\BiggerChest.csproj", "{DE3CECF4-1C6D-485E-BC74-96CA97FB8D9F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D88610FC-C6E6-4CF4-AAFF-72F8C3662B96}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,8 +1,8 @@
 {
   "Name": "Bigger Chest",
   "Author": "ZENG GE",
-  "Version": "0.0.1-beta.1",
-  "Description": "Bigger Chest",
+  "Version": "1.0.0",
+  "Description": "Let you has bigger chest",
   "UniqueID": "ZENG-GE.BiggerChest",
   "EntryDll": "BiggerChest.dll",
   "MinimumApiVersion": "4.0.0",

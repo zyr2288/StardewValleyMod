@@ -8,7 +8,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley.Menus;
 using StardewValley.Objects;
 
-namespace BiggerChest;
+namespace ZengGe.StardewValleyMod.BiggerChest;
 
 public class ModEntry : Mod
 {
@@ -18,77 +18,57 @@ public class ModEntry : Mod
 		GlobalVar.SMAPIMonitor = Monitor;
 		GlobalVar.SMAPIHarmonyLib = new Harmony(ModManifest.UniqueID);
 
+		GlobalVar.Config = helper.ReadConfig<ModConfig>();
+		GlobalVar.Config.Check();
+
 		BiggerChest.Install();
 
-		//GlobalVar.SMAPIHarmonyLib.Patch
-		//(
-		//	original: AccessTools.Method(typeof(Chest), "ShowMenu"),
-		//	prefix: new HarmonyMethod(typeof(BiggerChest), nameof(BiggerChest))
-		//);
-
-		// var info = helper.Reflection.GetField<Chest>(typeof(Chest), "capacity");
-
-
-		//info.SetValue(typeof(Chest), 70);
-
-		// helper.Events.Display.RenderedHud += Display_RenderedHud;
+		// 游戏载入，注册Mod设置功能
+		helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 	}
 
-	private void Display_RenderedHud(object? sender, RenderedHudEventArgs e)
+	#region 注册Mod设置功能
+	/// <summary>
+	/// 游戏载入，注册Mod设置功能
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
+	private void GameLoop_GameLaunched(object? sender, GameLaunchedEventArgs e)
 	{
-		var menu = Game1.activeClickableMenu;
-		if (menu is not ItemGrabMenu)
+		var configMenu = GlobalVar.SMAPIHelper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+		if (configMenu == null)
 			return;
 
-		var chestMenu = (ItemGrabMenu)menu;
-		var chest = (Chest)chestMenu.context;
-		if (chest is BiggerChest)
-			return;
+		configMenu.Register(ModManifest, GlobalVar.Config.Reset,
+			() => {
+				Helper.WriteConfig(GlobalVar.Config);
+			}
+		);
 
-		//var bigger = new BiggerChest
-		//{
+		configMenu.AddNumberOption(ModManifest,
+			() => GlobalVar.Config.Rows,
+			(int value) => {
+				if (value < 1) value = 1;
+				else if (value > 9) value = 9;
 
-		//};
+				GlobalVar.Config.Rows = value;
+			},
+			() => GlobalVar.SMAPIHelper.Translation.Get("config.chestRows"),
+			min: 1, max: 9
+		);
 
-		//bigger.Items.AddRange(chest.Items);
+		configMenu.AddNumberOption(ModManifest,
+			() => GlobalVar.Config.Columns,
+			(int value) => {
+				if (value < 1) value = 1;
+				else if (value > 20) value = 20;
 
-		//chestMenu.context = bigger;
-
-		////var chest = (Chest)chestMenu.context;
-		////chest.Items.CountItemStacks();
-
-		//var biggerMenu = new BiggerChestMenu(
-		//	chestMenu.ItemsToGrabMenu.xPositionOnScreen,
-		//	chestMenu.ItemsToGrabMenu.yPositionOnScreen,
-		//	false,
-		//	chestMenu.ItemsToGrabMenu.actualInventory,
-		//	capacity: BiggerChest.TotalCapacity,
-		//	rows: BiggerChest.Rows
-		//);
-
-		//////if (chestMenu.ItemsToGrabMenu.rows <= 3)
-		//////{
-		//////	chestMenu.ItemsToGrabMenu.capacity = 60;
-		//////	chestMenu.ItemsToGrabMenu.rows = 5;
-		//////}
-
-		//if (BiggerChest.Rows > 3)
-		//{
-		//	var pos = (BiggerChest.Rows - 3) * 24;
-		//	chestMenu.inventory.movePosition(0, pos);
-
-		//	//	//for (var i = bigger.allClickableComponents.Count; i < capacity; i++)
-		//	//	//{
-		//	//	//	var rec = new Rectangle();
-		//	//	//	var com = new ClickableComponent(rec, i.ToString());
-		//	//	//	bigger.allClickableComponents.Insert(0, com);
-		//	//	//}
-		//}
-		//chestMenu.ItemsToGrabMenu = biggerMenu;
+				GlobalVar.Config.Columns = value;
+			},
+			() => GlobalVar.SMAPIHelper.Translation.Get("config.chestColumns"),
+			min: 1, max: 20
+		);
 	}
+	#endregion 注册Mod设置功能
 
-	private void Display_Rendering(object? sender, RenderingEventArgs e)
-	{
-
-	}
 }
